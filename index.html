@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Tabs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .tabs {
+            display: flex;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .tabs li {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        .tabs li.active {
+            background-color: #ccc;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <ul class="tabs">
+        <li class="tab-link active" data-tab="tab-1">Tab 1 <span class="close-tab">×</span></li>
+    </ul>
+
+    <div id="tab-1" class="tab-content active">
+        <iframe src="https://www.example.com" id="iframe-1">
+            <!-- <input type="text"> -->
+        </iframe>
+        
+    </div>
+    <div style="text-align: center;">
+        <button id="add-tab">+</button>
+    </div>
+    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Close tab event
+            document.querySelector('.tabs').addEventListener('click', function (event) {
+                if (event.target.classList.contains('close-tab')) {
+                    var tab = event.target.closest('.tab-link');
+                    var tabId = tab.getAttribute('data-tab');
+                    tab.remove();
+                    document.getElementById(tabId).remove();
+                }
+            });
+
+            // Create new tab event
+            document.getElementById('add-tab').addEventListener('click', function () {
+                var tabCount = document.querySelectorAll('.tab-link').length + 1;
+                var newTab = document.createElement('li');
+                newTab.classList.add('tab-link');
+                newTab.setAttribute('data-tab', 'tab-' + tabCount);
+                newTab.textContent = 'Tab ' + tabCount;
+                newTab.innerHTML += '<span class="close-tab">×</span>';
+                document.querySelector('.tabs').appendChild(newTab);
+
+                var newContent = document.createElement('div');
+                newContent.id = 'tab-' + tabCount;
+                newContent.classList.add('tab-content');
+                document.body.appendChild(newContent);
+
+                var newIframe = document.createElement('iframe');
+                newIframe.src = 'about:blank'; // Start with blank page
+                newIframe.id = 'iframe-' + tabCount;
+                newContent.appendChild(newIframe);
+            });
+
+            // Switch tabs event
+            document.querySelector('.tabs').addEventListener('click', function (event) {
+                if (event.target.classList.contains('tab-link')) {
+                    var tabId = event.target.getAttribute('data-tab');
+                    var tabs = document.querySelectorAll('.tab-link');
+                    var tabContents = document.querySelectorAll('.tab-content');
+
+                    tabs.forEach(function (tab) {
+                        tab.classList.remove('active');
+                    });
+                    tabContents.forEach(function (content) {
+                        content.classList.remove('active');
+                    });
+
+                    event.target.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+
+                    var iframeId = 'iframe-' + tabId.split('-')[1];
+                    var iframe = document.getElementById(iframeId);
+                    iframe.src = ''; // Reset iframe source
+                    var urlInput = prompt('Enter URL:');
+                    if (urlInput) {
+                        iframe.src = urlInput;
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
